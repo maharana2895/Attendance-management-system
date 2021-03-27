@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="alert alert-success" role="alert">Successful management certification</div>
+
+
+    {#Panel start#}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Class management</h3>
+        </div>
+
+        <!-- Add modal box（Modal） -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {#Panel start#}
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Add class</h3>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <label class="control-label" for="classnameInput">Class name</label>
+                                    <input type="text" class="form-control" id="classnameInput1" placeholder="Please enter the class name">
+                                </div>
+                            </div>
+                        </div>
+                        {# End of panel#}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">shut down
+                        </button>
+                        <button type="button" class="btn btn-primary" id="add_close_mode2">
+                            Submit changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /Add modal box to end -->
+        <!-- Edit modal box（Modal） -->
+        <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {#Panel start#}
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Edit class</h3>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <label class="control-label" for="classnameInput">Class name</label>
+                                    <input type="text" class="form-control" id="classnameInput" placeholder="Please enter the class name">
+                                </div>
+                            </div>
+                        </div>
+                        {#End of panel#}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">shut down
+                        </button>
+                        <button type="button" class="btn btn-primary" id="add_close_model">
+                            Submit changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /Edit modal box ends -->
+
+
+        <script>
+            $('#myModal').on('click', '#add_close_model', function (ret) {
+
+
+                $add_class_name = $('#myModal #classnameInput').val()
+                $.post('/add_class/', {'add_class_name': $add_class_name}, function (ret) {
+                    alert(ret)
+                })
+                $('#myModal').modal('toggle')
+                window.location.reload(true)
+            })
+            $('#myModal1').on('click', '#add_close_model', function (ret) {
+                $edit_class_name = $('#myModal1 #classnameInput').val()
+                console.log($edit_class_name)
+                $.post('/edit_class/', {'edit_id':$('table').data('edit_id'),'edit_class_name': $edit_class_name}, function (ret) {
+                    alert(ret)
+                })
+
+                $('#myModal1').modal('toggle')
+                window.location.reload(true)
+            })
+
+        </script>
+
+        <div class="panel-body">
+            <!--Data table begins-->
+            <div class="row">
+
+                <div class="col-lg-4">
+                    <div class="input-group ">
+                        <input type="text" class="form-control" placeholder="Search for...">
+                        <span class="input-group-btn">
+                                <button class="btn btn-default" type="button">Go!</button>
+                            </span>
+                    </div><!-- /input-group -->
+                </div>
+
+
+                <a href="#">
+                    <button class="btn btn-success  col-lg-offset-6 col-lg-1" data-toggle="modal"
+                            data-target="#myModal" id="add_btn">Add to
+                    </button>
+                </a>
+            </div>
+            <hr>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>class</th>
+                        <th>operating</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for class in class_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ class.name }}</td>
+                            <td>
+                                <span class="hidden">{{ class.id }}</span>
+                                {#                                <a  href="/edit_class?edit_id={{ class.id }}" >#}
+                                <button class="btn btn-info" id="edit_btn" data-toggle="modal" data-target="#myModal1">
+                                    edit
+                                </button>
+
+                                {#                                </a>#}
+                                <a href="/delete_class?delete_id={{ class.id }}">
+                                    <button class="btn btn-danger">delete</button>
+                                </a>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+            <!--End of data sheet-->
+            <script>
+
+                $('table').on('click', '#edit_btn', function () {
+                    $('table').data('edit_id',$(this).prev().text())
+                    {#$.post('/edit_class/', {'edit_id':$(this).prev().text()})#}
+                    $edit_class_name = $(this).parent().prev().text()
+                    {#alert($edit_class_name)#}
+                    $('#myModal1 #classnameInput').val($edit_class_name)
+                })
+
+            </script>
+            <!--Start at the bottom of the panel-->
+            <div class="panel-footer">
+                <!--分页-->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pull-right">
+                        <li>
+                            <a href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li><a href="#">1</a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                        <li>
+                            <a href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    {#End of panel#}
+
+
+
+{% endblock content %}
+
+{#Sidebar#}
+{% block sidebar %}
+    9
+{% endblock sidebar %}
